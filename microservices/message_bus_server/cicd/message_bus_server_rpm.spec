@@ -18,7 +18,7 @@ Version: %{version}
 Release: %{dist}
 Summary: Message Bus Server
 License: Seagate Proprietary
-URL: https://github.com/Seagate/cortx-csm-agent
+URL: https://github.com/Seagate/cortx-manager
 Source0: <PRODUCT>-message_bus_server-%{version}.tar.gz
 %define debug_package %{nil}
 
@@ -26,63 +26,30 @@ Source0: <PRODUCT>-message_bus_server-%{version}.tar.gz
 Message Bus Server
 
 %prep
-%setup -n csm
+%setup -n message_bus_server
 # Nothing to do here
 
 %build
 
 %install
-mkdir -p ${RPM_BUILD_ROOT}<CSM_PATH>
-cp -rp . ${RPM_BUILD_ROOT}<CSM_PATH>
+mkdir -p ${RPM_BUILD_ROOT}<MESSAGE_BUS_SERVER_PATH>
+cp -rp . ${RPM_BUILD_ROOT}<MESSAGE_BUS_SERVER_PATH>
 exit 0
 
 %post
-# Use csm_setup cli for csm directory, permission services
-mkdir -p /etc/uds
-CSM_DIR=<CSM_PATH>
-CFG_DIR=$CSM_DIR/conf
-PRODUCT=<PRODUCT>
-
-# Move binary file
-[ -d "${CSM_DIR}/lib" ] && {
-    ln -sf $CSM_DIR/lib/csm_setup /usr/bin/csm_setup
-    ln -sf $CSM_DIR/lib/csm_setup $CSM_DIR/bin/csm_setup
-
-    ln -sf $CSM_DIR/lib/cortxcli /usr/bin/cortxcli
-    ln -sf $CSM_DIR/lib/cortxcli $CSM_DIR/bin/cortxcli
-
-    ln -sf $CSM_DIR/lib/csm_agent /usr/bin/csm_agent
-    ln -sf $CSM_DIR/lib/csm_agent $CSM_DIR/bin/csm_agent
-
-    ln -sf $CSM_DIR/lib/csm_cleanup /usr/bin/csm_cleanup
-    ln -sf $CSM_DIR/lib/csm_cleanup $CSM_DIR/bin/csm_cleanup
-
-    cp -f $CFG_DIR/service/csm_agent.service /etc/systemd/system/csm_agent.service
-}
-
-[ -d "${CSM_DIR}/test" ] && {
-    ln -sf $CSM_DIR/lib/csm_test /usr/bin/csm_test
-    ln -sf $CSM_DIR/lib/csm_test $CSM_DIR/bin/csm_test
-}
-
-[ -f /etc/uds/uds_s3.toml ] || \
-    cp -R $CFG_DIR/etc/uds/uds_s3.toml.sample /etc/uds/uds_s3.toml
+MESSAGE_BUS_SERVER_DIR=<MESSAGE_BUS_SERVER_PATH>
+CFG_DIR=$MESSAGE_BUS_SERVER_DIR/conf
+cp -f $CFG_DIR/service/message_bus_server.service /etc/systemd/system/message_bus_server.service
 exit 0
 
 %preun
 [ $1 -eq 1 ] && exit 0
-systemctl disable csm_agent
-systemctl stop csm_agent
+systemctl disable message_bus_server
+systemctl stop message_bus_server
 
 %postun
 [ $1 -eq 1 ] && exit 0
-rm -f /etc/systemd/system/csm_agent.service 2> /dev/null;
-rm -f /usr/bin/csm_setup 2> /dev/null;
-rm -f /usr/bin/cortxcli 2> /dev/null;
-rm -f /usr/bin/csm_agent 2> /dev/null;
-rm -f /usr/bin/csm_test 2> /dev/null;
-rm -f /usr/bin/csm_cleanup 2> /dev/null;
-rm -rf <CSM_PATH>/bin/ 2> /dev/null;
+rm -f /etc/systemd/system/message_bus_server.service 2> /dev/null;
 systemctl daemon-reload
 exit 0
 
@@ -91,8 +58,8 @@ exit 0
 %files
 # TODO - Verify permissions, user and groups for directory.
 %defattr(-, root, root, -)
-<CSM_PATH>/*
+<MESSAGE_BUS_SERVER_PATH>/*
 
 %changelog
-* Mon Jul 29 2019 Ajay Paratmandali <ajay.paratmandali@seagate.com> - 1.0.0
+* Thu Oct 15 2020 Shri Bhargav Metta <shri.metta@seagate.com> - 1.0.0
 - Initial spec file
