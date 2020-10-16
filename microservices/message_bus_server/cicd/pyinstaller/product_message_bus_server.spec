@@ -20,10 +20,10 @@ block_cipher = None
 
 # Analysis
 message_bus_server = Analysis([message_bus_server_path + 'server.py'],
-             pathex=['/usr/lib/python3.6/site-packages/'],
+             pathex=[],
              binaries=[],
              datas=[],
-             hiddenimports=[],
+             hiddenimports=['gunicorn.glogging', 'gunicorn.workers.gthread'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
@@ -31,8 +31,6 @@ message_bus_server = Analysis([message_bus_server_path + 'server.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-
-MERGE((message_bus_server, 'message_bus_server', 'message_bus_server'))
 
 # message_bus_server
 message_bus_server_pyz = PYZ(message_bus_server.pure, message_bus_server.zipped_data,
