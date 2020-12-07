@@ -16,8 +16,27 @@
 from .view import CsmView, CsmAuth
 from cortx.utils.log import Log
 from csm.common.permission_names import Resource, Action
+from marshmallow import Schema, fields, validate, ValidationError, validates, \
+        validates_schema
+from csm.common.errors import InvalidRequest
+from csm.core.controllers.validators import ValidationErrorFormatter
 
 
+class BasicStatsQueryParameter(Schema):
+    # getopt = fields.Str(data_key='get', default=None, missing=None, allow_none=True)
+    stats_id = fields.Str(data_key='id', default=None, missing=None, allow_none=True)
+    #metric_list = fields.List(fields.Str(), data_key='metric', default=[], missing=[])
+    from_t = fields.Int(required=True, data_key='from', validate=validate.Range(min=0))
+    to_t = fields.Int(required=True, data_key='to', validate=validate.Range(min=0))
+    interval = fields.Int(validate=validate.Range(min=0), allow_none=True,
+        default="", missing="")
+    total_sample = fields.Int(validate=validate.Range(min=0), allow_none=True,
+        default="", missing="")
+    output_format = fields.Str(default='gui', missing='gui')
+
+class ExtendedStatsQueryParameter(BasicStatsQueryParameter):
+    query = fields.Str(default="", missing="")
+    unit = fields.Str(default="", missing="")
 
 #@atomic
 @CsmView._app_routes.view("/api/v1/stats/{panel}")
@@ -40,22 +59,31 @@ class StatsView(CsmView):
                   f"user_id: {self.request.session.credentials.user_id}")
         getopt = self.request.rel_url.query.get("get", None)
         panel = self.request.match_info["panel"]
+
         if getopt == "label":
             return await self._service.get_labels(panel)
         elif getopt == "axis_unit":
             return await self._service.get_axis(panel)
         else:
+            metric_list = self.request.rel_url.query.getall("metric", [])
+            stats_qp = ExtendedStatsQueryParameter()
+            try:
+                stats_data = stats_qp.load(self.request.rel_url.query, unknown='EXCLUDE')
+            except ValidationError as val_err:
+                raise InvalidRequest(f"{ValidationErrorFormatter.format(val_err)}")
+            Log.debug(f"Parameters are:  {stats_data}. ")
+            """
             stats_id = self.request.rel_url.query.get("id", None)
             from_t = self.request.rel_url.query.get("from", None)
             to_t = self.request.rel_url.query.get("to", None)
-            metric_list = self.request.rel_url.query.getall("metric", [])
             interval = self.request.rel_url.query.get("interval", "")
             total_sample = self.request.rel_url.query.get("total_sample", "")
             output_format = self.request.rel_url.query.get("output_format", "gui")
             query = self.request.rel_url.query.get("query", "")
             unit = self.request.rel_url.query.get("unit", "")
-            return await self._service.get(stats_id, panel, from_t, to_t, metric_list,
-                interval, total_sample, unit, output_format, query)
+            """
+            # stats_data.pop('getopt')
+            return await self._service.get(metric_list, panel, **stats_data)
 
 @CsmView._app_routes.view("/api/v1/stats")
 class StatsPanelListView(CsmView):
@@ -91,22 +119,29 @@ class StatsPanelListView(CsmView):
         panelsopt = self.request.rel_url.query.getall("panel", None)
         metricsopt = self.request.rel_url.query.getall("metric", None)
         if panelsopt or metricsopt:
+
+            stats_qp = BasicStatsQueryParameter()
+            try:
+                stats_data = stats_qp.load(self.request.rel_url.query, unknown='EXCLUDE')
+            except ValidationError as val_err:
+                raise InvalidRequest(f"{ValidationErrorFormatter.format(val_err)}")
+            Log.debug(f"Parameters are:  {stats_data}. ")
+            """
             stats_id = self.request.rel_url.query.get("id", None)
             from_t = self.request.rel_url.query.get("from", None)
             to_t = self.request.rel_url.query.get("to", None)
             interval = self.request.rel_url.query.get("interval", "")
             total_sample = self.request.rel_url.query.get("total_sample", "")
             output_format = self.request.rel_url.query.get("output_format", "gui")
+            """
             if panelsopt:
-                Log.debug(f"Stats controller: Panels: {panelsopt}, from: {from_t}, to: {to_t}, "
-                          f"interval: {interval}, total_sample: {total_sample}")
-                return await self._service.get_panels(stats_id, panelsopt, from_t,
-                                                      to_t, interval, total_sample, output_format)
+                #Log.debug(f"Stats controller: Panels: {panelsopt}, from: {from_t}, to: {to_t}, "
+                #          f"interval: {interval}, total_sample: {total_sample}")
+                return await self._service.get_panels(panelsopt, **stats_data)
             else:
-                Log.debug(f"Stats controller: metric: {metricsopt}, total_sample: {total_sample}, "
-                          f"interval: {interval}, from: {from_t}, to: {to_t}")
-                return await self._service.get_metrics(stats_id, metricsopt, from_t, to_t,
-                                                       interval, total_sample, output_format)
+                #Log.debug(f"Stats controller: metric: {metricsopt}, total_sample: {total_sample}, "
+                #          f"interval: {interval}, from: {from_t}, to: {to_t}")
+                return await self._service.get_metrics(metricsopt, **stats_data)
         else:
             Log.debug("Handling Stats Get Panel List request")
             return await self._service.get_panel_list()

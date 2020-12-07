@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 from typing import Dict
 from cortx.utils.log import Log
 from csm.common.services import Service, ApplicationService
-from csm.common.errors import CsmInternalError
+from csm.common.errors import CsmInternalError, InvalidRequest
 
 STATS_DATA_MSG_NOT_FOUND = "stats_not_found"
 
@@ -38,13 +38,14 @@ class StatsAppService(ApplicationService):
     def __init__(self, stats_provider):
         self._stats_provider = stats_provider
 
-    async def get(self, stats_id, panel, from_t, to_t,
-                  metric_list, interval, total_sample, unit, output_format, query) -> Dict:
+    async def get(self, metric_list, panel, stats_id, from_t, to_t,
+                  interval, total_sample, unit, output_format, query) -> Dict:
         """
         Fetch specific statistics for panel - full parameter set
         :return: :type:list
         """
         Log.debug(f"Get panel: {panel} stats")
+        Log.debug(f"Input parameters: {stats_id, from_t, to_t, interval, total_sample, unit, output_format, query} ")
         output = {}
         if stats_id:
             output["id"]=stats_id
@@ -84,7 +85,7 @@ class StatsAppService(ApplicationService):
                 "metric_list": list(metric_list_dict_keys),
                 "unit_list": list(units_list_dict_keys)}
 
-    async def get_panels(self, stats_id, panels_list, from_t, to_t, interval,
+    async def get_panels(self, panels_list, stats_id, from_t, to_t, interval,
                          total_sample, output_format) -> Dict:
         """
         Fetch statistics for selected panels list (simplified - reduced parameter set)
@@ -110,7 +111,7 @@ class StatsAppService(ApplicationService):
         Log.debug(f"Stats Request Output: {output}")
         return output
 
-    async def get_metrics(self, stats_id, metrics_list, from_t, to_t, interval,
+    async def get_metrics(self,metrics_list, stats_id, from_t, to_t, interval,
                           total_sample, output_format) -> Dict:
         """
         Fetch statistics for selected panel.metric list (simplified - reduced parameter set)
@@ -131,7 +132,7 @@ class StatsAppService(ApplicationService):
                 else:
                     panels[li[0]]["unit"].append(li[2])
         except:
-            raise CsmInternalError("Invalid metric list for Stats %s" %metrics_list)
+            raise InvalidRequest("Invalid metric list for Stats %s" %metrics_list)
 
         if stats_id:
             output["id"]=stats_id
