@@ -13,6 +13,7 @@
 # For any questions about this software or licensing,
 # please email opensource@seagate.com or cortx-questions@seagate.com.
 
+from typing import Dict
 from .view import CsmView, CsmAuth
 from cortx.utils.log import Log
 from csm.common.permission_names import Resource, Action
@@ -20,6 +21,7 @@ from marshmallow import Schema, fields, validate, ValidationError, validates, \
         validates_schema
 from csm.common.errors import InvalidRequest
 from csm.core.controllers.validators import ValidationErrorFormatter
+from datetime import date, datetime
 
 
 class BasicStatsQueryParameter(Schema):
@@ -33,6 +35,19 @@ class BasicStatsQueryParameter(Schema):
     total_sample = fields.Int(validate=validate.Range(min=0), allow_none=True,
         default="", missing="")
     output_format = fields.Str(default='gui', missing='gui')
+
+    @validates_schema
+    def check_date(self, data: Dict, *args, **kwargs):
+        if data["from_t"] > data["to_t"]:
+            raise ValidationError(
+                "from date cannot be greater than to date.",
+                    field_name="from")
+        if data["to_t"] > datetime.now().timestamp():
+                raise ValidationError(
+                    "To date cannot be greater than today.")
+        if data["from_t"] > datetime.now().timestamp():
+                raise ValidationError(
+                    "From date cannot be greater than today.")
 
 class ExtendedStatsQueryParameter(BasicStatsQueryParameter):
     query = fields.Str(default="", missing="")
