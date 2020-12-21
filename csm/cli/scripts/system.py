@@ -15,6 +15,7 @@
 
 import sys
 from csm.core.blogic import const
+from csm.common.conf import Conf
 from csm.common.process import AsyncioSubprocess
 from cortx.utils.log import Log
 from csm.common.errors import CSM_OPERATION_SUCESSFUL
@@ -30,8 +31,8 @@ class System:
         :return:
         """
         _user = const.NON_ROOT_USER
-        _password = const.NON_ROOT_USER_PASS
         _command = "start"
+        _password = Conf.get(const.CSM_GLOBAL_INDEX, "CSM.password")
 
         Log.debug(f"executing command :-  "
                   f"{const.CORTXHA_CLUSTER.format(command=_command)}")
