@@ -310,7 +310,6 @@ class Setup:
             provisioner_data = conf_data[const.PROVISIONER]
             provisioner_data[const.CLUSTER_ID] = cluster_id
             conf_data[const.PROVISIONER] = provisioner_data
-            # NKP get csm user/password using salt command and set to conf 
 
         @staticmethod
         def create(args):
@@ -843,7 +842,6 @@ class CsmSetup(Setup):
         try:
             Log.info("Triggering csm_setup post_install")
             self._verify_args(args)
-            # NKP Get csm user credential from salt and decrypt password and set to variables 
             self._config_user()
             self.set_unsupported_feature_info()
             self._configure_system_auto_restart()
