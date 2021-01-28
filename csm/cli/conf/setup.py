@@ -64,6 +64,7 @@ class CortxCliSetup(Setup):
     @staticmethod
     def _rsyslog_cli():
         """Configure rsyslog."""
+        Log.info("Setingup rsyslog")
         if os.path.exists(const.RSYSLOG_DIR):
             Setup._run_cmd("cp -f " +const.CLI_SOURCE_RSYSLOG_PATH+ " " +const.CLI_RSYSLOG_PATH)
             Setup._run_cmd("cp -f " +const.CLI_SOURCE_SUPPORT_BUNDLE_CONF+ " " +const.SUPPORT_BUNDLE_CONF)
@@ -79,9 +80,12 @@ class CortxCliSetup(Setup):
         """
 
         try:
+            Log.info("Triggering cortxcli_setup config ")
             CortxCliSetup._verify_args(args)
             CortxCliSetup._rsyslog_cli()
-            self.Config.cli_create(args)
+            Log.info("Going for CLI create")
+            self.Configure.cli_create(args)
+
         except Exception as e:
             raise CsmSetupError(f"cortxcli_setup config failed. Error: {e} - {str(traceback.print_exc())}")
 
