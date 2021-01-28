@@ -16,6 +16,7 @@
 import os
 from cortx.utils.log import Log
 from csm.core.blogic import const
+from cortx.utils.conf_store.conf_store import Conf
 from csm.common.errors import CsmSetupError, InvalidRequest
 import traceback
 from csm.conf.setup import Setup
@@ -72,6 +73,29 @@ class CortxCliSetup(Setup):
         else:
             raise CsmSetupError("rsyslog failed. %s directory missing." %const.RSYSLOG_DIR)
 
+    def cli_create(self, command):
+        """
+        This Function Creates the CortxCli Conf File on Required Location.
+        :return:
+        """
+        Log.info("Into cli_create")
+        os.makedirs(const.CORTXCLI_PATH, exist_ok=True)
+        os.makedirs(const.CORTXCLI_CONF_PATH, exist_ok=True)
+        Setup._run_cmd(
+            f"setfacl -R -m u:{const.NON_ROOT_USER}:rwx {const.CORTXCLI_PATH}")
+        Setup._run_cmd(
+            f"setfacl -R -m u:{const.NON_ROOT_USER}:rwx {const.CORTXCLI_CONF_PATH}")
+        Log.info("setting up conf 127.0.0.1")
+        Conf.set(const.CORTXCLI_GLOBAL_INDEX,
+                 f"{const.CORTXCLI_SECTION}>{const.CSM_AGENT_HOST_PARAM_NAME}" ,
+                 command.options.get(const.ADDRESS_PARAM, "127.0.0.1"))
+        if self._is_env_vm:
+            Conf.set(const.CORTXCLI_GLOBAL_INDEX,
+                     f"{const.DEPLOYMENT}>{const.MODE}", const.DEV)
+        Log.info("copy conf path")
+        Setup._run_cmd(
+            f"cp -rn {const.CORTXCLI_SOURCE_CONF_PATH} {const.ETC_PATH}")
+
     def config(self, args):
         """
         Perform configuration for csm
@@ -84,8 +108,8 @@ class CortxCliSetup(Setup):
             CortxCliSetup._verify_args(args)
             CortxCliSetup._rsyslog_cli()
             Log.info("Going for CLI create")
-            self.Configure.cli_create(args)
-
+            self.cli_create(args)
+            Log.info("Bye Bye !!!!")
         except Exception as e:
             raise CsmSetupError(f"cortxcli_setup config failed. Error: {e} - {str(traceback.print_exc())}")
 
