@@ -28,7 +28,6 @@ CORTXCLI_CONF_PATH = ETC_PATH + "/cli"
 CSM_SOURCE_CONF = "{}/conf/etc/csm/csm.conf".format(CSM_PATH)
 CSM_SOURCE_CONF_URL = f"yaml://{CSM_SOURCE_CONF}"
 CSM_SETUP_LOG_DIR = "/tmp"
-CORTXCLI_SETUP_LOG_DIR = "/tmp"
 CSM_CONF_FILE_NAME = 'csm.conf'
 CORTXCLI_CONF_FILE_NAME = 'cortxcli.conf'
 CORTXCLI_CONF_FILE_URL = (f'yaml://{CORTXCLI_SOURCE_CONF_PATH}/'
@@ -44,7 +43,6 @@ CSM_SETUP_PASS = ":PASS"
 
 # Commands
 CSM_SETUP_CMD = 'csm_setup'
-CORTXCLI_SETUP_CMD = 'cortxcli_setup'
 INTERACTIVE_SHELL_HEADER = """
 **********************************\n
 CORTX Interactive Shell
@@ -296,7 +294,6 @@ FAULT_HEALTH = 'Fault'
 ALERT_MAPPING_TABLE = '{}/schema/alert_mapping_table.json'.format(CSM_PATH)
 HEALTH_MAPPING_TABLE = '{}/schema/csm_health_schema.json'.format(CSM_PATH)
 CSM_SETUP_FILE = '{}/schema/csm_setup.json'.format(CSM_PATH)
-CORTXCLI_SETUP_FILE = '{}/cli/schema/cortxcli_setup.json'.format(CORTXCLI_PATH)
 
 # Support Bundle
 SSH_USER_NAME = 'root'
