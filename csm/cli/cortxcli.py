@@ -127,7 +127,7 @@ class CortxCli(Cmd):
         """
         #Set Logger
         Conf.init()
-        Conf.load(const.CSM_GLOBAL_INDEX, Yaml(const.CORTXCLI_CONF))
+        Conf.load(const.CSM_GLOBAL_INDEX, f"yaml://{const.CSM_CONF}")
         Log.init("csm_cli",
              syslog_server=Conf.get(const.CSM_GLOBAL_INDEX, "Log>syslog_server"),
              syslog_port=Conf.get(const.CSM_GLOBAL_INDEX, "Log>syslog_port"),

@@ -142,7 +142,7 @@ cd $BASE_DIR
 [ -z "$VER" ] && VER=$(cat $BASE_DIR/VERSION)
 [ -z "$PRODUCT" ] && PRODUCT="cortx"
 [ -z "$KEY" ] && KEY="cortx@ees@csm@pr0duct"
-COMPONENT="cli"
+[ -z "$COMPONENT" ] && COMPONENT="all"
 [ -z "$TEST" ] && TEST=false
 [ -z "$INTEGRATION" ] && INTEGRATION=false
 [ -z "$DEV" ] && DEV=false
