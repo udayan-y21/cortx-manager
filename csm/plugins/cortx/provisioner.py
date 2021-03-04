@@ -61,7 +61,7 @@ class ProvisionerPlugin:
     def __init__(self, username=None, password=None):
         try:
             self.provisioner = provisioner
-            Log.info("Provisioner plugin is loaded")
+            Log.info(f"Provisioner plugin is loaded: {username} {password}")
 
             if username and password:
                 self.provisioner.auth_init(
@@ -211,7 +211,7 @@ class ProvisionerPlugin:
         def _command_handler():
             try:
                 if ( username and password ):
-                    Log.debug("Handling provisioner's create user api request")
+                    Log.info(f"Handling provisioner's create user api request username:{username} password:{password}")
                     self.provisioner.create_user(uname=username, passwd=password)
             except self.provisioner.errors.ProvisionerError as error:
                 Log.error(f"Provisioner api error : {error}")

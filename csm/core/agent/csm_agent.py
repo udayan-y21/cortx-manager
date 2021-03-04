@@ -149,6 +149,7 @@ class CsmAgent:
                 "username": Conf.get(const.CSM_GLOBAL_INDEX, const.NON_ROOT_USER_KEY),
                 "password": Conf.get(const.CSM_GLOBAL_INDEX, "CSM>password")
             }
+            Log.warn(f"DEBUG PURPOSE: {params}")
             provisioner = import_plugin_module(const.PROVISIONER_PLUGIN).ProvisionerPlugin(**params)
         except CsmError as ce:
             Log.error(f"Unable to load Provisioner plugin: {ce}")
