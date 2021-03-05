@@ -94,7 +94,7 @@ Options:
     exit 1;
 }
 
-while getopts ":g:v:b:p:c:n:tdiq" o; do
+while getopts ":g:v:b:p:c:n:l:tdiq" o; do
     case "${o}" in
         v)
             VER=${OPTARG}
