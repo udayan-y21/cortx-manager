@@ -141,7 +141,7 @@ cd $BASE_DIR
 [ -z "$COMPONENT" ] && COMPONENT="backend"
 TEST=true
 INTEGRATION=false
-DEV=true
+DEV=false
 QA=true
 
 echo "Using COMPONENT=${COMPONENT} VERSION=${VER} BUILD=${BUILD} PRODUCT=${PRODUCT} TEST=${TEST}..."
