@@ -227,8 +227,8 @@ if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
 
     # Copy Backend files
     mkdir -p "$DIST/csm/lib" "$DIST/csm/bin" "$DIST/csm/conf" "$TMPDIR/csm"
-    cp -rs "$BASE_DIR/csm/"* "$TMPDIR/csm"
-    cp -rs "$BASE_DIR/test/" "$TMPDIR/csm"
+    cp -rs "$BASE_DIR/csm/"* "$DIST/csm"
+    cp -rs "$BASE_DIR/test/" "$DIST/csm"
 
     cp -R "$BASE_DIR/schema" "$DIST/csm/"
     cp -R "$BASE_DIR/templates" "$DIST/csm/"
