@@ -121,17 +121,23 @@ class Security:
         :return:
         """
         cluster_id = conf_store.get(const.CSM_GLOBAL_INDEX, const.CLUSTER_ID_KEY)
+        Log.info(f"Cluster id: {cluster_id}")
         if not cluster_id:
             raise ClusterIdFetchError("Failed to get cluster id.")
         for each_key in const.DECRYPTION_KEYS:
+            Log.info(f"Each key---->{each_key}")
+            Log.info(f"const.DECRYPTION_KEYS[each_key]: {const.DECRYPTION_KEYS[each_key]}")
             cipher_key = Cipher.generate_key(cluster_id,
                                              const.DECRYPTION_KEYS[each_key])
+            Log.info(f"Cipher key: {cipher_key}")
             encrypted_value = conf_store.get(const.CSM_GLOBAL_INDEX, each_key)
+            Log.info(f"encrypted_value: {encrypted_value}")
             try:
                 decrypted_value = Cipher.decrypt(cipher_key,
                                                  encrypted_value.encode("utf-8"))
                 conf_store.set(const.CSM_GLOBAL_INDEX, each_key,
                         decrypted_value.decode("utf-8"))
+                Log.info(f"Decrypted passwords saved {decrypted_value.decode('utf-8')}")
             except CipherInvalidToken as error:
                 import traceback
                 Log.exception(f"Decryption for {each_key} Failed. {error}")
