@@ -220,25 +220,30 @@ ENV_END_TIME=$(date +%s)
 if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
 
     cp "$BASE_DIR/cicd/csm_agent.spec" "$TMPDIR"
-
+    yum install -y tree
     # Build CSM Backend
     CORE_BUILD_START_TIME=$(date +%s)
+
+    # Copy Backend files
+    mkdir -p "$DIST/csm/lib" "$DIST/csm/bin" "$DIST/csm/conf" "$TMPDIR/csm"
+    echo "Copy whole csm directory"
+    cp -r "$BASE_DIR/csm/"* "$DIST/csm"
+    echo "Copy whole test directory"
+    cp -r "$BASE_DIR/test/" "$DIST/csm"
+    tree L 3
+    echo "=========================================================================================="
     mkdir -p "$DIST/csm/conf/service"
     cp "$CONF/setup.yaml" "$DIST/csm/conf"
     cp -R "$CONF/etc" "$DIST/csm/conf"
     cp -R "$CONF/service/csm_agent.service" "$DIST/csm/conf/service"
     cd "$TMPDIR"
 
-    # Copy Backend files
-    mkdir -p "$DIST/csm/lib" "$DIST/csm/bin" "$DIST/csm/conf" "$TMPDIR/csm"
-    cp -rs "$BASE_DIR/csm/"* "$DIST/csm"
-    cp -rs "$BASE_DIR/test/" "$DIST/csm"
-
     cp -R "$BASE_DIR/schema" "$DIST/csm/"
     cp -R "$BASE_DIR/templates" "$DIST/csm/"
     cp -R "$BASE_DIR/csm/scripts" "$DIST/csm/"
     cp -R "$BASE_DIR/csm/cli/schema/csm_setup.json" "$DIST/csm/schema/"
-
+    tree L 3
+    echo "``````````````````````````````````````````````````````````````````````````````````````````````````````"
     # Create spec for pyinstaller
     [ "$TEST" == true ] && {
         # PYINSTALLER_FILE=$TMPDIR/${PRODUCT}_csm_test.spec
