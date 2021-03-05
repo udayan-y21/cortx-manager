@@ -152,6 +152,9 @@ echo "Using COMPONENT=${COMPONENT} VERSION=${VER} BUILD=${BUILD} PRODUCT=${PRODU
 # Create fresh one to accomodate all packages.
 COPY_START_TIME=$(date +%s)
 DIST="$BASE_DIR/dist"
+[ -d "$DIST" ] && {
+    rm -rf ${DIST}
+}
 TMPDIR="$DIST/tmp"
 [ -d "$TMPDIR" ] && {
     rm -rf ${TMPDIR}
