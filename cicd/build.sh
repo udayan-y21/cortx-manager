@@ -82,7 +82,6 @@ usage: $PROG_NAME [-v <csm version>]
 Options:
     -v : Build rpm with version
     -b : Build rpm with build number
-    -k : Provide key for encryption of code
     -p : Provide product name default cortx
     -c : Build rpm for [all|backend|cli]
     -n : brand name
@@ -95,7 +94,7 @@ Options:
     exit 1;
 }
 
-while getopts ":g:v:b:p:k:c:n:l:tdiq" o; do
+while getopts ":g:v:b:p:c:n:tdiq" o; do
     case "${o}" in
         v)
             VER=${OPTARG}
@@ -105,9 +104,6 @@ while getopts ":g:v:b:p:k:c:n:l:tdiq" o; do
             ;;
         p)
             PRODUCT=${OPTARG}
-            ;;
-        k)
-            KEY=${OPTARG}
             ;;
         c)
             COMPONENT=${OPTARG}
@@ -142,11 +138,11 @@ cd $BASE_DIR
 [ -z "$VER" ] && VER=$(cat $BASE_DIR/VERSION)
 [ -z "$PRODUCT" ] && PRODUCT="cortx"
 [ -z "$KEY" ] && KEY="cortx@ees@csm@pr0duct"
-[ -z "$COMPONENT" ] && COMPONENT="all"
-[ -z "$TEST" ] && TEST=false
-[ -z "$INTEGRATION" ] && INTEGRATION=false
-[ -z "$DEV" ] && DEV=false
-[ -z "$QA" ] && QA=false
+[ -z "$COMPONENT" ] && COMPONENT="backend"
+TEST=true
+INTEGRATION=false
+DEV=true
+QA=true
 
 echo "Using COMPONENT=${COMPONENT} VERSION=${VER} BUILD=${BUILD} PRODUCT=${PRODUCT} TEST=${TEST}..."
 
@@ -200,16 +196,12 @@ if [ "$DEV" == true ]; then
     install_py_req req_dev.txt
 
 else
+echo "--------------------------------------------"
     pip3 install --upgrade pip
-    pip3 install pyinstaller==3.5
 
     # add cortx-py-utils below
-    # Need to remove erase of eos-py-utils after re changes
-    yum erase -y -q eos-py-utils
     yum install -y cortx-py-utils 
     yum install -y python36-cortx-prvsnr
-
-    install_py_req requirment.txt
 
 fi
 
@@ -223,7 +215,7 @@ ENV_END_TIME=$(date +%s)
 
 if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
 
-cp "$BASE_DIR/cicd/csm_agent.spec" "$TMPDIR"
+    cp "$BASE_DIR/cicd/csm_agent.spec" "$TMPDIR"
 
     # Build CSM Backend
     CORE_BUILD_START_TIME=$(date +%s)
@@ -245,8 +237,8 @@ cp "$BASE_DIR/cicd/csm_agent.spec" "$TMPDIR"
 
     # Create spec for pyinstaller
     [ "$TEST" == true ] && {
-        PYINSTALLER_FILE=$TMPDIR/${PRODUCT}_csm_test.spec
-        cp "$BASE_DIR/cicd/pyinstaller/product_csm_test.spec" "${PYINSTALLER_FILE}"
+        # PYINSTALLER_FILE=$TMPDIR/${PRODUCT}_csm_test.spec
+        # cp "$BASE_DIR/cicd/pyinstaller/product_csm_test.spec" "${PYINSTALLER_FILE}"
         mkdir -p "$DIST/csm/test"
         cp -R "$BASE_DIR/test/plans" "$BASE_DIR/test/test_data" "$DIST/csm/test"
     } || {
@@ -254,9 +246,9 @@ cp "$BASE_DIR/cicd/csm_agent.spec" "$TMPDIR"
         cp "$BASE_DIR/cicd/pyinstaller/product_csm.spec" "${PYINSTALLER_FILE}"
     }
 
-    sed -i -e "s|<PRODUCT>|${PRODUCT}|g" \
-        -e "s|<CSM_PATH>|${TMPDIR}/csm|g" "${PYINSTALLER_FILE}"
-    python3 -m PyInstaller --clean -y --distpath "${DIST}/csm" --key "${KEY}" "${PYINSTALLER_FILE}"
+    # sed -i -e "s|<PRODUCT>|${PRODUCT}|g" \
+        # -e "s|<CSM_PATH>|${TMPDIR}/csm|g" "${PYINSTALLER_FILE}"
+    # python3 -m PyInstaller --clean -y --distpath "${DIST}/csm" --key "${KEY}" "${PYINSTALLER_FILE}"
 
 ################## Add CSM_PATH #################################
 
