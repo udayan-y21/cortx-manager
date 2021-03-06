@@ -139,7 +139,7 @@ cd $BASE_DIR
 [ -z "$VER" ] && VER=$(cat $BASE_DIR/VERSION)
 [ -z "$PRODUCT" ] && PRODUCT="cortx"
 [ -z "$KEY" ] && KEY="cortx@ees@csm@pr0duct"
-[ -z "$COMPONENT" ] && COMPONENT="backend"
+[ -z "$COMPONENT" ] && COMPONENT="all"
 TEST=true
 INTEGRATION=false
 DEV=false
@@ -194,19 +194,12 @@ if [ "$DEV" == true ]; then
     source "${VENV}/bin/activate"
     python --version
     pip install --upgrade pip
-    pip install pyinstaller==3.5
-
-    install_py_req requirment.txt
-    install_py_req req_dev.txt
 
 else
-echo "--------------------------------------------"
     pip3 install --upgrade pip
-
     # add cortx-py-utils below
     yum install -y cortx-py-utils 
     yum install -y python36-cortx-prvsnr
-
 fi
 
 # Solving numpy libgfortran-ed201abd.so.3.0.0 dependency problem
@@ -231,34 +224,19 @@ if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
     cp -rf "$BASE_DIR/templates" "$DIST/csm/"
     cp -rf "$BASE_DIR/test/" "$DIST/csm"
     cp -rf "$BASE_DIR/csm/cli/schema/csm_setup.json" "$DIST/csm/schema/"
-    ls -la "$DIST/csm/"
-    tree -L 4 "$DIST/csm/"
+
     # Copy executables files
     cp -f "$BASE_DIR/csm/core/agent/csm_agent.py" "$DIST/csm/lib/csm_agent"
     cp -f "$BASE_DIR/csm/conf/csm_setup.py" "$DIST/csm/lib/csm_setup"
     cp -f "$BASE_DIR/csm/conf/csm_cleanup.py" "$DIST/csm/lib/csm_cleanup"
     cp -f "$DIST/csm/test/test_framework/csm_test.py" "$DIST/csm/lib/csm_test"
     chmod +x "$DIST/csm/lib/"*
-    ls -la "$DIST/csm/lib"
-
-    tree -L 4
-
     cd "$TMPDIR"
     # Create spec for pyinstaller
     [ "$TEST" == true ] && {
-        # PYINSTALLER_FILE=$TMPDIR/${PRODUCT}_csm_test.spec
-        # cp "$BASE_DIR/cicd/pyinstaller/product_csm_test.spec" "${PYINSTALLER_FILE}"
         mkdir -p "$DIST/csm/test"
         cp -R "$BASE_DIR/test/plans" "$BASE_DIR/test/test_data" "$DIST/csm/test"
-    } || {
-        PYINSTALLER_FILE=$TMPDIR/${PRODUCT}_csm.spec
-        cp "$BASE_DIR/cicd/pyinstaller/product_csm.spec" "${PYINSTALLER_FILE}"
     }
-
-    # sed -i -e "s|<PRODUCT>|${PRODUCT}|g" \
-        # -e "s|<CSM_PATH>|${TMPDIR}/csm|g" "${PYINSTALLER_FILE}"
-    # python3 -m PyInstaller --clean -y --distpath "${DIST}/csm" --key "${KEY}" "${PYINSTALLER_FILE}"
-
 ################## Add CSM_PATH #################################
 
     # Genrate spec file for CSM
@@ -287,35 +265,27 @@ fi
 
 if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "cli" ]; then
 
-cp "$BASE_DIR/cicd/cortxcli.spec" "$TMPDIR"
+    cp "$BASE_DIR/cicd/cortxcli.spec" "$TMPDIR"
 
     # Build CortxCli
     CLI_BUILD_START_TIME=$(date +%s)
-    mkdir -p "$DIST/cli/conf/service"
+    mkdir -p "$DIST/cli/lib" "$DIST/cli/bin" "$DIST/cli/conf" "$DIST/cli/cli/"
+
+    #Copy CLI files
+    cp -R "$BASE_DIR/schema" "$DIST/cli/"
+    cp -R "$BASE_DIR/templates" "$DIST/cli/"
+    cp -R "$BASE_DIR/csm/scripts" "$DIST/cli/"
+    cp -R "$BASE_DIR/csm/cli/schema" "$DIST/cli/cli/"
+
     cp "$CLI_CONF/setup.yaml" "$DIST/cli/conf/setup.yaml"
     cp "$CLI_CONF/uds_setup.yaml" "$DIST/cli/conf/uds_setup.yaml"
     cp "$CLI_CONF/elasticsearch_setup.yaml" "$DIST/cli/conf/elasticsearch_setup.yaml"
     cp "$CLI_CONF/alerts_setup.yaml" "$DIST/cli/conf/alerts_setup.yaml"
     cp -R "$CLI_CONF/etc" "$DIST/cli/conf"
+
+    cp -f "$BASE_DIR/csm/cli/cortxcli.py" "$DIST/cli/lib"
+    chmod +x "$DIST/cli/lib/"*    
     cd "$TMPDIR"
-
-    # Copy Backend files
-    mkdir -p "$DIST/cli/lib" "$DIST/cli/bin" "$DIST/cli/conf" "$TMPDIR/csm"
-    cp -rs "$BASE_DIR/csm/"* "$TMPDIR/csm"
-    #TODO: Allow test to work with cli
-
-    cp -R "$BASE_DIR/schema" "$DIST/cli/"
-    cp -R "$BASE_DIR/templates" "$DIST/cli/"
-    cp -R "$BASE_DIR/csm/scripts" "$DIST/cli/"
-    mkdir -p  "$DIST/cli/cli/"
-    cp -R "$BASE_DIR/csm/cli/schema" "$DIST/cli/cli/"
-
-    PYINSTALLER_FILE=$TMPDIR/${PRODUCT}_cli.spec
-    cp "$BASE_DIR/cicd/pyinstaller/product_cli.spec" "${PYINSTALLER_FILE}"
-
-    sed -i -e "s|<PRODUCT>|${PRODUCT}|g" \
-        -e "s|<CORTXCLI_PATH>|${TMPDIR}/csm|g" "${PYINSTALLER_FILE}"
-    python3 -m PyInstaller --clean -y --distpath "${DIST}/cli" --key "${KEY}" "${PYINSTALLER_FILE}"
 
 ################## Add CORTXCLI_PATH #################################
 
