@@ -214,36 +214,35 @@ pip uninstall -y numpy
 pip install numpy --no-binary :all:
 
 ENV_END_TIME=$(date +%s)
+yum install -y tree
 
 ################### Backend ##############################
 
 if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
 
     cp "$BASE_DIR/cicd/csm_agent.spec" "$TMPDIR"
-    yum install -y tree
     # Build CSM Backend
     CORE_BUILD_START_TIME=$(date +%s)
+    mkdir -p "$DIST/csm/bin $DIST/csm/lib"
 
     # Copy Backend files
-    mkdir -p "$DIST/csm/lib" "$DIST/csm/bin" "$DIST/csm/conf" "$TMPDIR/csm"
-    echo "Copy whole csm directory"
-    cp -r "$BASE_DIR/csm/"* "$DIST/csm"
-    echo "Copy whole test directory"
-    cp -r "$BASE_DIR/test/" "$DIST/csm"
-    tree L 3
-    echo "=========================================================================================="
-    mkdir -p "$DIST/csm/conf/service"
-    cp "$CONF/setup.yaml" "$DIST/csm/conf"
-    cp -R "$CONF/etc" "$DIST/csm/conf"
-    cp -R "$CONF/service/csm_agent.service" "$DIST/csm/conf/service"
-    cd "$TMPDIR"
+    cp -rf "$BASE_DIR/csm/"* "$DIST/csm"
+    cp -rf "$BASE_DIR/schema" "$DIST/csm/"
+    cp -rf "$BASE_DIR/templates" "$DIST/csm/"
+    cp -rf "$BASE_DIR/test/" "$DIST/csm"
+    cp -rf "$BASE_DIR/csm/cli/schema/csm_setup.json" "$DIST/csm/schema/"
+    ls -la "$BASE_DIR/csm/"
+    # Copy executables files
+    cp -rf "$BASE_DIR/csm/core/agent/csm_agent.py" "$DIST/csm/lib/csm_agent"
+    cp -rf "$BASE_DIR/csm/conf/csm_setup.py" "$DIST/csm/lib/csm_setup"
+    cp -rf "$BASE_DIR/csm/conf/csm_cleanup.py $DIST/csm/lib/csm_cleanup"
+    cp -rf "$BASE_DIR/csm/test/test_framework/csm_test.py $DIST/csm/lib/csm_test"
+    chmod +x "$DIST/csm/lib/"*
+    ls -la "$BASE_DIR/csm/lib"
 
-    cp -R "$BASE_DIR/schema" "$DIST/csm/"
-    cp -R "$BASE_DIR/templates" "$DIST/csm/"
-    cp -R "$BASE_DIR/csm/scripts" "$DIST/csm/"
-    cp -R "$BASE_DIR/csm/cli/schema/csm_setup.json" "$DIST/csm/schema/"
-    tree L 3
-    echo "``````````````````````````````````````````````````````````````````````````````````````````````````````"
+    tree -L 4
+
+    cd "$TMPDIR"
     # Create spec for pyinstaller
     [ "$TEST" == true ] && {
         # PYINSTALLER_FILE=$TMPDIR/${PRODUCT}_csm_test.spec
