@@ -283,7 +283,8 @@ if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "cli" ]; then
     cp "$CLI_CONF/alerts_setup.yaml" "$DIST/cli/conf/alerts_setup.yaml"
     cp -R "$CLI_CONF/etc" "$DIST/cli/conf"
 
-    cp -f "$BASE_DIR/csm/cli/cortxcli.py" "$DIST/cli/lib"
+    # Copy executables files
+    cp -f "$BASE_DIR/csm/cli/cortxcli.py" "$DIST/cli/lib/cortxcli"
     chmod +x "$DIST/cli/lib/"*    
     cd "$TMPDIR"
 
