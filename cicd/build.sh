@@ -237,9 +237,9 @@ if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
     cp -f "$BASE_DIR/csm/core/agent/csm_agent.py" "$DIST/csm/lib/csm_agent"
     cp -f "$BASE_DIR/csm/conf/csm_setup.py" "$DIST/csm/lib/csm_setup"
     cp -f "$BASE_DIR/csm/conf/csm_cleanup.py" "$DIST/csm/lib/csm_cleanup"
-    cp -f "$BASE_DIR/csm/test/test_framework/csm_test.py" "$DIST/csm/lib/csm_test"
+    cp -f "$DIST/csm/test/test_framework/csm_test.py" "$DIST/csm/lib/csm_test"
     chmod +x "$DIST/csm/lib/"*
-    ls -la "$BASE_DIR/csm/lib"
+    ls -la "$DIST/csm/lib"
 
     tree -L 4
 
