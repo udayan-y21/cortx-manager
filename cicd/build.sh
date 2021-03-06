@@ -288,7 +288,8 @@ if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "cli" ]; then
     cd "$TMPDIR"
 
 ################## Add CORTXCLI_PATH #################################
-
+tree -L 4 "$DIST/cli/"
+tree -L 4 "$DIST/csm/"
 # Genrate spec file for CSM
     sed -i -e "s/<RPM_NAME>/${PRODUCT}-cli/g" \
         -e "s|<CSM_AGENT_RPM_NAME>|${PRODUCT}-csm_agent|g" \
