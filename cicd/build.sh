@@ -223,7 +223,7 @@ if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
     cp "$BASE_DIR/cicd/csm_agent.spec" "$TMPDIR"
     # Build CSM Backend
     CORE_BUILD_START_TIME=$(date +%s)
-    mkdir -p "$DIST/csm/bin $DIST/csm/lib"
+    mkdir -p "$DIST/csm/bin" "$DIST/csm/lib"
 
     # Copy Backend files
     cp -rf "$BASE_DIR/csm/"* "$DIST/csm"
@@ -231,7 +231,8 @@ if [ "$COMPONENT" == "all" ] || [ "$COMPONENT" == "backend" ]; then
     cp -rf "$BASE_DIR/templates" "$DIST/csm/"
     cp -rf "$BASE_DIR/test/" "$DIST/csm"
     cp -rf "$BASE_DIR/csm/cli/schema/csm_setup.json" "$DIST/csm/schema/"
-    ls -la "$BASE_DIR/csm/"
+    ls -la "$DIST/csm/"
+    tree -L 4 "$DIST/csm/"
     # Copy executables files
     cp -rf "$BASE_DIR/csm/core/agent/csm_agent.py" "$DIST/csm/lib/csm_agent"
     cp -rf "$BASE_DIR/csm/conf/csm_setup.py" "$DIST/csm/lib/csm_setup"
