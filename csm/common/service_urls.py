@@ -56,8 +56,9 @@ class ServiceUrls:
         :param scheme: URI scheme
         :returns: S3 server URI based on the provided scheme
         """
-        network_configuration = await self._provisioner.get_network_configuration()
-        ip = f'{network_configuration.cluster_ip}'
+        #network_configuration = await self._provisioner.get_network_configuration()
+        #ip = f'{network_configuration.cluster_ip}'
+        ip = '127.0.0.1'
         if scheme == 's3':
             port = Conf.get(const.CSM_GLOBAL_INDEX, 'S3>s3_port')
             uri = f'{scheme}://{ip}:{port}'
