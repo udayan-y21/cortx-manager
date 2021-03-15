@@ -143,8 +143,7 @@ class AuditService(ApplicationService):
                                                    "Log>max_result_window"), 0)
         audit_logs = await self.audit_mngr.retrieve_by_range(component,
                                                    query_limit, time_range)
-        return [COMPONENT_MODEL_MAPPING[component]["format"].
-                               format(**(log.to_primitive())) for log in audit_logs ]
+        return [log.to_primitive() for log in audit_logs]
 
     async def get_audit_log_zip(self, component: str, start_time: str, end_time: str):
         """ get zip file for all records from given range """
