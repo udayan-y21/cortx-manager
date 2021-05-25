@@ -83,6 +83,10 @@ class Setup:
             Log.error(f"Connection to Db Failed. {traceback.format_exc()}")
             raise CsmSetupError(f"Connection to Db Failed. {e}")
 
+    def _copy_skeleton_configs(self):
+        os.makedirs(const.CSM_CONF_PATH, exist_ok=True)
+        Setup._run_cmd(f"cp -rn {const.CSM_SOURCE_CONF_PATH} {const.ETC_PATH}")
+
     def _validate_conf_store_keys(self, index, keylist=None):
         if not keylist:
             keylist = list(self.conf_store_keys.values())
