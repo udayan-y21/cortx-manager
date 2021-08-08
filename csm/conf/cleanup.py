@@ -59,12 +59,6 @@ class Cleanup(Setup):
             Log.info(f"Deleteing path :{dir_path}")
             Setup._run_cmd(f"rm -rf {dir_path}")
 
-    def web_env_file_cleanup(self):
-       Log.info(f"Replacing {const.CSM_WEB_DIST_ENV_FILE_PATH}_tmpl " \
-                                    f"{const.CSM_WEB_DIST_ENV_FILE_PATH}")
-       Setup._run_cmd(f"cp -f {const.CSM_WEB_DIST_ENV_FILE_PATH}_tmpl " \
-                                    f"{const.CSM_WEB_DIST_ENV_FILE_PATH}")
-
     async def _unsupported_feature_entry_cleanup(self):
         Log.info("Unsupported feature cleanup")
         port = Conf.get(const.DATABASE_INDEX, 'databases>es_db>config>port')
