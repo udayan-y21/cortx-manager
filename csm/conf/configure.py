@@ -83,30 +83,30 @@ class Configure(Setup):
 
         self.cluster_id = Conf.get(const.CONSUMER_INDEX,
                         self.conf_store_keys[const.KEY_CLUSTER_ID])
-        self.set_csm_endpoint()
-        self.set_s3_info()
-        self._create_perf_stat_topic()
-        try:
-            self._configure_csm_ldap_schema()
-            self._set_user_collection()
-            await self._create_cluster_admin(self.force_action)
-            self.create()
-            for count in range(0, 4):
-                try:
-                    await self._set_unsupported_feature_info()
-                    break
-                except Exception as e_:
-                    Log.warn(f"Unable to connect to ES. Retrying : {count+1}. {e_}")
-                    time.sleep(2**count)
-        except ValidationError as ve:
-            Log.error(f"Validation Error: {ve}")
-            raise CsmSetupError(f"Validation Error: {ve}")
-        except Exception as e:
-            import traceback
-            err_msg = (f"csm_setup config command failed. Error: "
-                       f"{e} - {str(traceback.format_exc())}")
-            Log.error(err_msg)
-            raise CsmSetupError(err_msg)
+#         self.set_csm_endpoint()
+#         self.set_s3_info()
+#         self._create_perf_stat_topic()
+#         try:
+#             self._configure_csm_ldap_schema()
+#             self._set_user_collection()
+#             await self._create_cluster_admin(self.force_action)
+#             self.create()
+#             for count in range(0, 4):
+#                 try:
+#                     await self._set_unsupported_feature_info()
+#                     break
+#                 except Exception as e_:
+#                     Log.warn(f"Unable to connect to ES. Retrying : {count+1}. {e_}")
+#                     time.sleep(2**count)
+#         except ValidationError as ve:
+#             Log.error(f"Validation Error: {ve}")
+#             raise CsmSetupError(f"Validation Error: {ve}")
+#         except Exception as e:
+#             import traceback
+#             err_msg = (f"csm_setup config command failed. Error: "
+#                        f"{e} - {str(traceback.format_exc())}")
+#             Log.error(err_msg)
+#             raise CsmSetupError(err_msg)
         return Response(output=const.CSM_SETUP_PASS, rc=CSM_OPERATION_SUCESSFUL)
 
     def _prepare_and_validate_confstore_keys(self):
